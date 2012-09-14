@@ -31,16 +31,18 @@
                 self.participant = ko.observable();
                 self.question = ko.observable();
                 self.answers = ko.observableArray([]);
-
+                
                 self.play = function() {
-                    self.question("Qual a capital da Rússia?");
-                    self.answers.push("Servia");                   
+                    $.getJSON("/thinkfast", {}, function(data){
+                        self.question(data.description);
+                        self.answers.removeAll();
+                        $.map(data.answers, function(answer) {
+                            self.answers.push(answer);
+                        });
+                    });
                 }
             }
-
             ko.applyBindings(new ThinkFast());
-
-
         </script>
     </body>
 </html>
