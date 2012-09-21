@@ -17,6 +17,7 @@ public class ThinkFastController extends HttpServlet {
     @Override
     public void init(ServletConfig servletConfig) {
         this.game = new ThinkFastGame();
+        this.game.init();
     }
 
     @Override

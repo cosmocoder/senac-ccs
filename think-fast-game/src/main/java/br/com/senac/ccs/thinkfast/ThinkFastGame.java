@@ -24,38 +24,38 @@ public class ThinkFastGame {
         this.lock = new ReentrantLock();
     }
 
-    public void play( String id, String name, AsyncContext asyncContext ) throws IOException {
+    public void play(String id, String name, AsyncContext asyncContext) throws IOException {
         lock.lock();
         try {
             Participant participant = new Participant(id, name, asyncContext);
-            participants.put(id,participant);
-            participant.notify(new Result(currentQuestion,"Welcome:"));
+            participants.put(id, participant);
+            participant.notify(new Result(currentQuestion, "Welcome:"));
         } finally {
             lock.unlock();
         }
     }
 
-    public void bind( String id, AsyncContext asyncContext ) {
+    public void bind(String id, AsyncContext asyncContext) {
         participants.get(id).setAsyncContext(asyncContext);
     }
 
-    public void answer( String id, String answer ) throws IOException {
+    public void answer(String id, String answer) throws IOException {
         lock.lock();
         try {
-            if(this.currentQuestion.getAnswer().equals(answer)) {
+            if (this.currentQuestion.getAnswer().equals(answer)) {
                 Question question = currentQuestion;
                 Collections.shuffle(questions);
                 currentQuestion = questions.get(0);
                 questions.add(question);
                 Participant winner = participants.remove(id);
-                winner.notify(new Result(currentQuestion,"Congratulations!"));
-                Result result = new Result(currentQuestion,String.format("Player %s have answered faster, try again."));
+                winner.notify(new Result(currentQuestion, "Congratulations!"));
+                Result result = new Result(currentQuestion, String.format("Player %s have answered faster, try again.", winner.getName()));
                 for (Participant participant : participants.values()) {
                     participant.notify(result);
                 }
             } else {
                 Participant participant = participants.get(id);
-                participant.notify(new Result(currentQuestion,String.format("Player %s have answered faster, try again.")));
+                participant.notify(new Result(currentQuestion, "Fail!"));
             }
 
         } finally {
@@ -64,8 +64,8 @@ public class ThinkFastGame {
     }
 
     public void init() {
-        this.questions.add( new Question( "Qual a capital dos EUA?", Arrays.asList( new String[]{ "Washington DC", "California", "Nevada" } ), "Washington DC" ) );
-        this.questions.add( new Question( "Qual a capital da Russia?", Arrays.asList( new String[]{ "Berlin", "Paris", "Moscou" } ), "Moscou" ) );
-        this.currentQuestion = questions.get( 0 );
+        this.questions.add(new Question("Qual a capital dos EUA?", Arrays.asList(new String[]{"Washington DC", "California", "Nevada"}), "Washington DC"));
+        this.questions.add(new Question("Qual a capital da Russia?", Arrays.asList(new String[]{"Berlin", "Paris", "Moscou"}), "Moscou"));
+        this.currentQuestion = questions.get(0);
     }
 }

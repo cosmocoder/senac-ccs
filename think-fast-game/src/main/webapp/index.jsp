@@ -33,13 +33,12 @@
                 self.answers = ko.observableArray([]);
                 self.message = ko.observable();
                 
-                alert('aki');
+               
                 self.play = function(data) {
                     $.getJSON("/thinkfast", {action: "play", name: self.participant()}, function(data){
                         self.parseResult(data);    
                     });
                 }
-                alert('depois');
 
                 self.bind = function(data) {
                     $.getJSON("/thinkfast", {action: "bind"}, function(data){
@@ -58,12 +57,13 @@
                 self.parseResult = function(data) {
                     if(data.question) {
                         self.question(data.question.description);
-                        self.question.answers.removeAll();
-                        $.map(data.answers, function(answer) {
+                        self.answers.removeAll();
+                        $.map(data.question.answers, function(answer) {
                             self.answers.push(answer);
                         });
-                        self.message(data.message);
+                        
                     }
+                    self.message(data.message);
                 }
             }
             ko.applyBindings(new ThinkFast());
