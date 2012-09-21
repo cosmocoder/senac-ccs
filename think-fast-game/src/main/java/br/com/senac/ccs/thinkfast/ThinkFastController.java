@@ -24,7 +24,6 @@ public class ThinkFastController extends HttpServlet {
                          HttpServletResponse response)
             throws ServletException, IOException {
 
-
         String action = request.getParameter("action");
         String id = request.getSession().getId();
         if ("play".equals(action)) {
@@ -34,17 +33,5 @@ public class ThinkFastController extends HttpServlet {
         } else if ("bind".equals(action)) {
             game.bind(id, request.startAsync());
         }
-
-
-        Question question = new Question(
-                "Qual a capital dos EUA?",
-                Arrays.asList(new String[]{"Washington DC", "California", "Nevada"}),
-                "Washington DC");
-
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(question);
-        response.setContentType("application/json");
-        response.getWriter().write(json);
-        response.flushBuffer();
     }
 }

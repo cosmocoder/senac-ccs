@@ -1,7 +1,11 @@
 package br.com.senac.ccs.thinkfast;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Question {
 
     private final String description;
@@ -22,6 +26,7 @@ public class Question {
         return answers;
     }
 
+    @JsonIgnore
     public String getAnswer() {
         return answer;
     }
