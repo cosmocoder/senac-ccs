@@ -1,12 +1,12 @@
 package br.com.senac.ccs.thinkfast;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
-import javax.servlet.*;
-import javax.servlet.annotation.*;
-import javax.servlet.http.*;
 
 @WebServlet(urlPatterns = {"/thinkfast"},
         asyncSupported = true, loadOnStartup = 1)

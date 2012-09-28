@@ -1,5 +1,7 @@
 package br.com.senac.ccs.thinkfast;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +19,7 @@ public class ThinkFastGame {
     private final Lock lock;
     private final List<Question> questions;
     private Question currentQuestion;
+    ObjectMapper objectMapper = new ObjectMapper();
 
     public ThinkFastGame() {
         this.participants = new ConcurrentHashMap<String, Participant>();
@@ -29,7 +32,7 @@ public class ThinkFastGame {
         try {
             Participant participant = new Participant(id, name, asyncContext);
             participants.put(id, participant);
-            participant.notify(new Result(currentQuestion, "Welcome:"));
+            participant.notify(new Result(currentQuestion, String.format("Welcome: %s", participant.getName())));
         } finally {
             lock.unlock();
         }
@@ -42,17 +45,22 @@ public class ThinkFastGame {
     public void answer(String id, String answer) throws IOException {
         lock.lock();
         try {
+
             if (this.currentQuestion.getAnswer().equals(answer)) {
                 Question question = currentQuestion;
                 Collections.shuffle(questions);
                 currentQuestion = questions.get(0);
                 questions.add(question);
-                Participant winner = participants.remove(id);
-                winner.notify(new Result(currentQuestion, "Congratulations!"));
-                Result result = new Result(currentQuestion, String.format("Player %s have answered faster, try again.", winner.getName()));
+                Participant winner = participants.get(id);
+                winner.incrementScore();
+                String placar = objectMapper.writeValueAsString(participants.values());
+                winner.notify(new Result(currentQuestion, String.format("Congratulations! Placar %s", placar)));
+                participants.remove(id);
+                Result result = new Result(currentQuestion, String.format("Player %s have answered faster, try again. Placar %s", winner.getName(), placar));
                 for (Participant participant : participants.values()) {
                     participant.notify(result);
                 }
+                participants.put(id, winner);
             } else {
                 Participant participant = participants.get(id);
                 participant.notify(new Result(currentQuestion, "Fail!"));

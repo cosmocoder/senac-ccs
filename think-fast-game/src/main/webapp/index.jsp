@@ -11,7 +11,7 @@
         <h1>Think Fast Game</h1>
         <div id="participant">
             <h2>Insert your name and click start to begin:</h2>
-            <input type="text" name="participant" />
+            <input type="text" name="participant" data-bind="value: participant"/>
             <input type="button" value="start" data-bind="click: play" />
         </div>
         <br/>
@@ -23,7 +23,7 @@
                     <span data-bind="text: $data">Moscou</span>
                 </li>
             </ul>
-            <span id="message" data-bind:"text: message"></span>
+            <span id="message" data-bind="text: message"></span>
         </div>
         <script>
             var ThinkFast = function() {
@@ -36,7 +36,8 @@
                
                 self.play = function(data) {
                     $.getJSON("/thinkfast", {action: "play", name: self.participant()}, function(data){
-                        self.parseResult(data);    
+                        self.parseResult(data);
+                        self.bind();
                     });
                 }
 

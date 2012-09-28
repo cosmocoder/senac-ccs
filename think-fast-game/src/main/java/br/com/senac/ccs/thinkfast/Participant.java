@@ -1,5 +1,6 @@
 package br.com.senac.ccs.thinkfast;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -28,6 +29,7 @@ public class Participant {
         this.asyncContext = asyncContext;
     }
 
+    @JsonIgnore
     public String getId() {
         return id;
     }
