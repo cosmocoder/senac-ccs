@@ -1,5 +1,6 @@
 package br.com.senac.ccs.thinkfast;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,27 +19,29 @@ import java.io.IOException;
 @RequestMapping(value = "/thinkfast/*", produces = "application/json")
 public class ThinkFastController {
 
-    private ThinkFastGame game;
-
-    public void init(ServletConfig servletConfig) {
-        this.game = new ThinkFastGame();
-        this.game.init();
+    @Autowired
+    public ThinkFastController( ThinkFastGame game) {
+        this.game = game;
     }
+
+    private ThinkFastGame game;
 
     @RequestMapping(value = "play", method = RequestMethod.GET)
     public @ResponseBody Result play(@RequestParam String name, HttpSession session) {
-        DeferredResult<Result> deferredResult = new DeferredResult<Result>();
-        String id = session.getId();
-        Screen screen = new WebScreen(deferredResult);
-        return game.play(id,name,screen);
+        return game.play(session.getId(), name, new WebScreen());
     }
 
-    public void bind(HttpSession session) {
+    @RequestMapping(value = "bind", method = RequestMethod.GET)
+    public @ResponseBody DeferredResult bind(HttpSession session) {
+        WebScreen screen = new WebScreen();
         String id = session.getId();
+        game.bind(id, screen);
+        return screen.getDeferredResult();
     }
 
-    public void answer(@RequestParam String answer, HttpSession session) {
-        String id = session.getId();
+    @RequestMapping(value = "answer", method = RequestMethod.GET)
+    public @ResponseBody Result answer(@RequestParam String answer, HttpSession session) {
+        return game.answer(session.getId(), answer);
     }
 
 }
