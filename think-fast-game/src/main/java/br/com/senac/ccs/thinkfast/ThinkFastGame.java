@@ -51,7 +51,7 @@ public class ThinkFastGame {
     public Result answer(String id, String answer) {
         lock.lock();
         try {
-            if (this.currentQuestion.getAnswer().equals(answer)) {
+            if (this.currentQuestion.getAnswer().getDescription().equals(answer)) {
                 Question question = currentQuestion;
                 Collections.shuffle(questions);
                 currentQuestion = questions.get(0);
