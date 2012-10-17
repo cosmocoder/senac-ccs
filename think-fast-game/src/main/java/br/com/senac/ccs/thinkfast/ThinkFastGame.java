@@ -1,7 +1,9 @@
 package br.com.senac.ccs.thinkfast;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -21,11 +23,14 @@ public class ThinkFastGame {
     private final Lock lock;
     private final List<Question> questions;
     private Question currentQuestion;
+    private QuestionRepository questionRepository;
 
-    public ThinkFastGame() {
+    @Autowired
+    public ThinkFastGame(QuestionRepository questionRepository) {
         this.participants = new ConcurrentHashMap<String, Participant>();
-        this.questions = new ArrayList<Question>();
         this.lock = new ReentrantLock();
+        this.questionRepository = questionRepository;
+        this.questions = new ArrayList<Question>();
     }
 
     public Result play(String id, String name, Screen screen) {
@@ -72,8 +77,24 @@ public class ThinkFastGame {
 
     @PostConstruct
     public void init() {
-        this.questions.add(new Question("Qual a capital dos EUA?", Arrays.asList(new String[]{"Washington DC", "California", "Nevada"}), "Washington DC"));
-        this.questions.add(new Question("Qual a capital da Russia?", Arrays.asList(new String[]{"Berlin", "Paris", "Moscou"}), "Moscou"));
+        Answer rightAnswer1 = new Answer("Washington DC");
+        questionRepository.save(new Question("Qual a capital dos EUA?", Arrays.asList(
+                new Answer[]{
+                        rightAnswer1,
+                        new Answer("California"),
+                        new Answer("Nevada")}),
+                rightAnswer1)
+        );
+        Answer rightAnswer2 = new Answer("Moscou");
+        questionRepository.save(new Question("Qual a capital da Russia?",
+                Arrays.asList(new Answer[]{
+                        new Answer("Berlin"),
+                        new Answer("Paris"),
+                        rightAnswer2}),
+                rightAnswer2)
+        );
+
+        this.questions.addAll(questionRepository.findAll());
         this.currentQuestion = questions.get(0);
     }
 }

@@ -60,7 +60,7 @@
                         self.question(data.question.description);
                         self.answers.removeAll();
                         $.map(data.question.answers, function(answer) {
-                            self.answers.push(answer);
+                            self.answers.push(answer.description);
                         });
                         
                     }

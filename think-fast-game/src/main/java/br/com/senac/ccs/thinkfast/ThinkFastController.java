@@ -20,7 +20,7 @@ import java.io.IOException;
 public class ThinkFastController {
 
     @Autowired
-    public ThinkFastController( ThinkFastGame game) {
+    public ThinkFastController(ThinkFastGame game) {
         this.game = game;
     }
 
