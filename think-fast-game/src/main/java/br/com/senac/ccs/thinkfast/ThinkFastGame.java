@@ -21,8 +21,6 @@ public class ThinkFastGame {
 
     private final ConcurrentHashMap<String, Participant> participants;
     private final Lock lock;
-    private final List<Question> questions;
-    private Question currentQuestion;
     private QuestionRepository questionRepository;
 
     @Autowired
@@ -30,7 +28,6 @@ public class ThinkFastGame {
         this.participants = new ConcurrentHashMap<String, Participant>();
         this.lock = new ReentrantLock();
         this.questionRepository = questionRepository;
-        this.questions = new ArrayList<Question>();
     }
 
     public Result play(String id, String name, Screen screen) {
@@ -38,7 +35,7 @@ public class ThinkFastGame {
         try {
             Participant participant = new Participant(id, name, screen);
             participants.put(id, participant);
-            return new Result(currentQuestion, String.format("Welcome: %s", participant.getName()));
+            return new Result(questionRepository.getCurrent(), String.format("Welcome: %s", participant.getName()));
         } finally {
             lock.unlock();
         }
@@ -51,22 +48,20 @@ public class ThinkFastGame {
     public Result answer(String id, String answer) {
         lock.lock();
         try {
-            if (this.currentQuestion.getAnswer().getDescription().equals(answer)) {
-                Question question = currentQuestion;
-                Collections.shuffle(questions);
-                currentQuestion = questions.get(0);
-                questions.add(question);
+            Question question = questionRepository.getCurrent();
+            if (question.getAnswer().getDescription().equals(answer)) {
+                question = questionRepository.findNext(question);
                 Participant winner = participants.get(id);
                 winner.incrementScore();
-                winner.notify(new Result(currentQuestion, String.format("Congratulations!")));
+                winner.notify(new Result(question, String.format("Congratulations!")));
                 participants.remove(id);
-                Result result = new Result(currentQuestion, String.format("Player %s have answered faster, try again.", winner.getName()));
+                Result result = new Result(question, String.format("Player %s have answered faster, try again.", winner.getName()));
                 for (Participant participant : participants.values()) {
                     participant.notify(result);
                 }
                 participants.put(id, winner);
             } else {
-                return new Result(currentQuestion, "Fail!");
+                return new Result(question, "Fail!");
             }
         } finally {
             lock.unlock();
@@ -93,8 +88,5 @@ public class ThinkFastGame {
                         rightAnswer2}),
                 rightAnswer2)
         );
-
-        this.questions.addAll(questionRepository.findAll());
-        this.currentQuestion = questions.get(0);
     }
 }
